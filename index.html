@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitFlow - Your Habit Tracking Companion</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <section id="authScreen" class="auth-screen">
+        <div class="auth-shell">
+            <div class="auth-panel">
+                <div class="auth-header">
+                    <div>
+                        <p class="auth-kicker">Private workspace</p>
+                        <h1>HabitFlow</h1>
+                    </div>
+                    <button type="button" class="theme-toggle" id="authThemeToggle" title="Switch theme" aria-label="Switch theme">☾</button>
+                </div>
+
+                <p class="auth-copy">Sign in to pick up where you left off, or create a new account to start fresh.</p>
+
+                <div class="auth-tabs">
+                    <button type="button" class="auth-tab active" id="authLoginTab">Login</button>
+                    <button type="button" class="auth-tab" id="authRegisterTab">Register</button>
+                </div>
+
+                <div class="alert auth-alert" id="authAlert"></div>
+
+                <form id="loginForm" class="auth-form active">
+                    <label class="auth-field">
+                        <span>Username</span>
+                        <input type="text" id="loginUsername" autocomplete="username" placeholder="Enter your username" required>
+                    </label>
+                    <label class="auth-field">
+                        <span>Password</span>
+                        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required>
+                    </label>
+                    <button type="submit" class="btn-add-habit auth-submit">Login</button>
+                </form>
+
+                <form id="registerForm" class="auth-form">
+                    <label class="auth-field">
+                        <span>Username</span>
+                        <input type="text" id="registerUsername" autocomplete="username" placeholder="Choose a username" required>
+                    </label>
+                    <label class="auth-field">
+                        <span>Password</span>
+                        <input type="password" id="registerPassword" autocomplete="new-password" placeholder="Create a password" required>
+                    </label>
+                    <label class="auth-field">
+                        <span>Confirm password</span>
+                        <input type="password" id="registerConfirmPassword" autocomplete="new-password" placeholder="Repeat your password" required>
+                    </label>
+                    <button type="submit" class="btn-add-habit auth-submit">Create account</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div id="appShell" class="app-shell" hidden>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h1>🎯 HabitFlow</h1>
+                </div>
+
+                <div class="nav-stats">
+                    <span class="stat-item">
+                        <span class="stat-label">Active Habits</span>
+                        <span class="stat-value" id="activeHabitsCount">0</span>
+                    </span>
+                    <span class="stat-item">
+                        <span class="stat-label">Today's Progress</span>
+                        <span class="stat-value" id="todayProgress">0%</span>
+                    </span>
+                </div>
+
+                <div class="nav-actions">
+                    <span class="user-chip" id="userChip"></span>
+                    <button type="button" class="nav-btn icon-btn" id="themeToggle" title="Switch theme" aria-label="Switch theme">☾</button>
+                    <button type="button" class="nav-btn nav-ghost" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <div class="sidebar-content">
+                    <div class="add-habit-section">
+                        <h3>Create New Habit</h3>
+                        <form id="habitForm" class="habit-form">
+                            <input
+                                type="text"
+                                id="habitName"
+                                placeholder="Habit name (e.g., Morning Run)"
+                                required
+                            >
+                            <select id="habitCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="Health">🏃 Health</option>
+                                <option value="Learning">📚 Learning</option>
+                                <option value="Productivity">💼 Productivity</option>
+                                <option value="Mindfulness">🧘 Mindfulness</option>
+                                <option value="Finance">💰 Finance</option>
+                                <option value="Social">👥 Social</option>
+                                <option value="Other">✨ Other</option>
+                            </select>
+                            <textarea
+                                id="habitDescription"
+                                placeholder="Description (optional)"
+                                rows="3"
+                            ></textarea>
+                            <input
+                                type="number"
+                                id="habitGoal"
+                                placeholder="Daily goal (e.g., 30 minutes)"
+                                min="1"
+                                required
+                            >
+                            <button type="submit" class="btn-add-habit">
+                                + Add Habit
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="alert" id="alert"></div>
+
+                <div class="filter-tabs">
+                    <button class="tab-btn active" data-filter="all">All Habits</button>
+                    <button class="tab-btn" data-filter="Health">Health</button>
+                    <button class="tab-btn" data-filter="Learning">Learning</button>
+                    <button class="tab-btn" data-filter="Productivity">Productivity</button>
+                    <button class="tab-btn" data-filter="Mindfulness">Mindfulness</button>
+                    <button class="tab-btn" data-filter="Finance">Finance</button>
+                    <button class="tab-btn" data-filter="Social">Social</button>
+                </div>
+
+                <div class="habits-container" id="habitsContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">🔒</div>
+                        <h2>Sign in to continue</h2>
+                        <p>Your dashboard will appear here once you log in.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>Edit Habit</h2>
+                <form id="editForm" class="habit-form">
+                    <input type="hidden" id="editHabitId">
+                    <input
+                        type="text"
+                        id="editHabitName"
+                        placeholder="Habit name"
+                        required
+                    >
+                    <select id="editHabitCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Health">🏃 Health</option>
+                        <option value="Learning">📚 Learning</option>
+                        <option value="Productivity">💼 Productivity</option>
+                        <option value="Mindfulness">🧘 Mindfulness</option>
+                        <option value="Finance">💰 Finance</option>
+                        <option value="Social">👥 Social</option>
+                        <option value="Other">✨ Other</option>
+                    </select>
+                    <textarea
+                        id="editHabitDescription"
+                        placeholder="Description (optional)"
+                        rows="3"
+                    ></textarea>
+                    <input
+                        type="number"
+                        id="editHabitGoal"
+                        placeholder="Daily goal"
+                        min="1"
+                        required
+                    >
+                    <div class="modal-buttons">
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                        <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 HabitFlow. Build habits, change your life. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
