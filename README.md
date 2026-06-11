@@ -17,7 +17,7 @@ npm install
 npm start
 ```
 
-Open `http://localhost:5000`.
+Open `http://localhost:5001`.
 
 ## API
 
@@ -51,4 +51,3 @@ Open `http://localhost:5000`.
 
 - Habits are scoped to the signed-in user.
 - Passwords are stored hashed with a salt.
-

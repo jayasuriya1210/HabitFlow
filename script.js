@@ -1,6 +1,6 @@
 const API_BASE_URL = window.location.origin && window.location.origin !== 'null'
     ? `${window.location.origin}/api`
-    : 'http://localhost:5000/api';
+    : 'http://localhost:5001/api';
 
 const TOKEN_STORAGE_KEY = 'habitflow_session_token';
 const THEME_STORAGE_KEY = 'habitflow_theme';
