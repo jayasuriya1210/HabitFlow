@@ -121,6 +121,11 @@ body.dark-mode {
     transform: translateY(-2px);
 }
 
+.nav-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
 .stat-item {
     display: flex;
     flex-direction: column;
