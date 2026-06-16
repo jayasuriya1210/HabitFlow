@@ -2,23 +2,28 @@ import { THEME_STORAGE_KEY } from './config.js';
 
 export function applyTheme(theme, persist = true) {
     const activeTheme = theme === 'dark' ? 'dark' : 'light';
-    document.body.classList.toggle('dark-mode', activeTheme === 'dark');
+    document.documentElement.setAttribute('data-theme', activeTheme);
 
     if (persist) {
         localStorage.setItem(THEME_STORAGE_KEY, activeTheme);
     }
 
     const label = activeTheme === 'dark' ? '☀' : '☾';
-    const tooltip = activeTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
 
-    ['themeToggle', 'authThemeToggle'].forEach((id) => {
-        const button = document.getElementById(id);
+    document.querySelectorAll('#themeBtn, #dashThemeToggle, .theme-btn').forEach((button) => {
         if (button) {
             button.textContent = label;
-            button.title = tooltip;
-            button.setAttribute('aria-label', tooltip);
         }
     });
+    
+    const sw = document.getElementById('darkSwitch');
+    if (sw) {
+        if (activeTheme === 'dark') {
+            sw.classList.add('on');
+        } else {
+            sw.classList.remove('on');
+        }
+    }
 
     return activeTheme;
 }

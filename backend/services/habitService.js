@@ -225,6 +225,20 @@ async function getStats(userId) {
         const progress = totalHabits > 0 ? Math.round((completedToday / totalHabits) * 100) : 0;
 
         const statsByCategory = {};
+        let totalCompletions = 0;
+        let longestStreak = 0;
+
+        const last7DaysMap = {};
+        for(let i=0; i<7; i++) {
+             let d = new Date();
+             d.setDate(d.getDate() - i);
+             last7DaysMap[d.toISOString().split('T')[0]] = 0;
+        }
+
+        const last8WeeksMap = Array(8).fill(0);
+        const nowMs = Date.now();
+        const weekMs = 7 * 24 * 60 * 60 * 1000;
+
         habits.forEach((habit) => {
             if (!statsByCategory[habit.category]) {
                 statsByCategory[habit.category] = { total: 0, completedToday: 0 };
@@ -233,14 +247,49 @@ async function getStats(userId) {
             if (habit.completedDates.includes(today)) {
                 statsByCategory[habit.category].completedToday++;
             }
+            
+            totalCompletions += habit.completedDates.length;
+            
+            habit.completedDates.forEach(dateStr => {
+                 if(last7DaysMap[dateStr] !== undefined) {
+                     last7DaysMap[dateStr]++;
+                 }
+                 
+                 const dateMs = new Date(dateStr).getTime();
+                 const diffMs = nowMs - dateMs;
+                 const weekIndex = Math.floor(diffMs / weekMs);
+                 if(weekIndex >= 0 && weekIndex < 8) {
+                     last8WeeksMap[7 - weekIndex]++;
+                 }
+            });
+            
+            if(habit.completedDates.length > 0) {
+                 const dates = [...habit.completedDates].sort((a,b)=>new Date(a)-new Date(b));
+                 let cur = 1;
+                 let max = 1;
+                 for(let i=1; i<dates.length; i++) {
+                      const prev = new Date(dates[i-1]);
+                      const curr = new Date(dates[i]);
+                      const diff = Math.round((curr - prev) / (1000*60*60*24));
+                      if(diff === 1) { cur++; max = Math.max(max, cur); }
+                      else if(diff > 1) { cur = 1; }
+                 }
+                 longestStreak = Math.max(longestStreak, max);
+            }
         });
+
+        const last7Days = Object.keys(last7DaysMap).sort().map(k => last7DaysMap[k]);
 
         return {
             success: true,
             totalHabits,
             completedToday,
             todayProgress: `${progress}%`,
-            statsByCategory
+            statsByCategory,
+            last7Days,
+            last8Weeks: last8WeeksMap,
+            totalCompletions,
+            longestStreak
         };
     } catch (error) {
         console.error('Error fetching stats:', error);

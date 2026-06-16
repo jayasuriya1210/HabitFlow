@@ -1,89 +1,64 @@
-let alertTimer;
-let authAlertTimer;
-
 export function showAlert(message, type = 'success') {
-    const alertBox = document.getElementById('alert');
-    if (!alertBox) return;
+    const alertsContainer = document.getElementById('appAlerts');
+    if (!alertsContainer) return;
+    const alertBox = document.createElement('div');
+    alertBox.style.padding = '12px 16px';
+    alertBox.style.background = type === 'danger' ? '#fee2e2' : type === 'warning' ? '#fef3c7' : '#d1fae5';
+    alertBox.style.color = type === 'danger' ? '#991b1b' : type === 'warning' ? '#92400e' : '#065f46';
+    alertBox.style.borderRadius = '8px';
+    alertBox.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.1)';
     alertBox.innerHTML = message;
-    alertBox.className = `alert ${type} show`;
-
-    window.clearTimeout(alertTimer);
-    alertTimer = window.setTimeout(() => {
-        alertBox.classList.remove('show');
+    alertBox.style.transition = 'opacity 0.3s ease';
+    alertsContainer.appendChild(alertBox);
+    setTimeout(() => { 
+        alertBox.style.opacity = '0';
+        setTimeout(() => alertBox.remove(), 300);
     }, 3000);
 }
 
 export function showAuthAlert(message, type = 'success') {
-    const alertBox = document.getElementById('authAlert');
-    if (!alertBox) return;
-    alertBox.innerHTML = message;
-    alertBox.className = `alert auth-alert ${type} show`;
-
-    window.clearTimeout(authAlertTimer);
-    authAlertTimer = window.setTimeout(() => {
-        alertBox.classList.remove('show');
-    }, 3000);
+    showAlert(message, type);
 }
 
-export function clearAuthAlert() {
-    const alertBox = document.getElementById('authAlert');
-    if (alertBox) {
-        alertBox.classList.remove('show');
-    }
+export function clearAuthAlert() {}
+
+export function go(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + page);
+    if(target) target.classList.add('active');
+    window.scrollTo(0,0);
 }
 
 export function showApp(currentUser) {
-    const authScreen = document.getElementById('authScreen');
-    const appShell = document.getElementById('appShell');
-    if (authScreen) {
-        authScreen.hidden = true;
-        authScreen.style.display = 'none';
+    go('dashboard');
+    const userChips = document.querySelectorAll('.sidebar-foot span');
+    userChips.forEach(chip => {
+        if(chip.textContent.startsWith('@')) chip.textContent = `@${currentUser.username}`;
+    });
+    const overviewWelcome = document.getElementById('overview-welcome');
+    if (overviewWelcome && currentUser) {
+        overviewWelcome.textContent = `Welcome back, ${currentUser.username}.`;
     }
-    if (appShell) {
-        appShell.hidden = false;
-        appShell.style.display = 'block';
-    }
-
-    const userChip = document.getElementById('userChip');
-    if (userChip && currentUser) {
-        userChip.textContent = `@${currentUser.username}`;
-    }
+    const planDisplay = document.getElementById('currentPlanDisplay');
+    if(planDisplay && currentUser) planDisplay.textContent = currentUser.subscriptionPlan || 'Free';
 }
 
 export function showAuth() {
-    const authScreen = document.getElementById('authScreen');
-    const appShell = document.getElementById('appShell');
-    if (authScreen) {
-        authScreen.hidden = false;
-        authScreen.style.display = 'flex';
-    }
-    if (appShell) {
-        appShell.hidden = true;
-        appShell.style.display = 'none';
-    }
-    showAuthView('login');
+    go('home'); 
 }
 
 export function showAuthView(view) {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
-    const loginTab = document.getElementById('authLoginTab');
-    const registerTab = document.getElementById('authRegisterTab');
-
-    if (loginForm) {
-        loginForm.classList.toggle('active', view === 'login');
+    if(loginForm && registerForm) {
+        if(view === 'login') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        }
     }
-    if (registerForm) {
-        registerForm.classList.toggle('active', view === 'register');
-    }
-    if (loginTab) {
-        loginTab.classList.toggle('active', view === 'login');
-    }
-    if (registerTab) {
-        registerTab.classList.toggle('active', view === 'register');
-    }
-
-    clearAuthAlert();
 }
 
 export function openEditModal(id, habits) {
@@ -93,19 +68,22 @@ export function openEditModal(id, habits) {
     document.getElementById('editHabitId').value = id;
     document.getElementById('editHabitName').value = habit.name;
     document.getElementById('editHabitCategory').value = habit.category;
-    document.getElementById('editHabitDescription').value = habit.description;
+    document.getElementById('editHabitDescription').value = habit.description || '';
     document.getElementById('editHabitGoal').value = habit.goal;
 
-    document.getElementById('editModal').classList.add('show');
+    document.getElementById('editModal').style.display = 'block';
 }
 
 export function closeEditModal() {
     const modal = document.getElementById('editModal');
-    if (modal) {
-        modal.classList.remove('show');
-    }
+    if (modal) modal.style.display = 'none';
     const editForm = document.getElementById('editForm');
-    if (editForm) {
-        editForm.reset();
-    }
+    if (editForm) editForm.reset();
+}
+
+export function renderChart(id, values) {
+    const el = document.getElementById(id);
+    if (!el || !values || !values.length) return;
+    const max = Math.max(...values, 1); // default to 1 to avoid divide by zero
+    el.innerHTML = values.map(v => `<div class="bar" style="height:${(v/max)*100}%" title="${v}"></div>`).join('');
 }

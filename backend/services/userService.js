@@ -8,6 +8,8 @@ function toPublicUser(user) {
     return {
         id: user._id.toString(),
         username: user.username,
+        email: user.email || '',
+        subscriptionPlan: user.subscriptionPlan || 'Free',
         createdAt: user.createdAt,
         lastLoginAt: user.lastLoginAt || null
     };
@@ -37,8 +39,10 @@ async function createUser(userData) {
 
         const user = {
             username,
+            email: userData.email || '',
             passwordSalt: salt,
             passwordHash: hash,
+            subscriptionPlan: 'Free',
             tokenVersion: 0,
             createdAt: now,
             updatedAt: now,
@@ -174,10 +178,84 @@ async function clearSession(sessionToken) {
     }
 }
 
+async function updateSubscription(userId, planName) {
+    try {
+        const usersCollection = getUsersCollection();
+        const result = await usersCollection.findOneAndUpdate(
+            { _id: new ObjectId(userId) },
+            { 
+                $set: { 
+                    subscriptionPlan: planName,
+                    updatedAt: new Date()
+                } 
+            },
+            { returnDocument: 'after' }
+        );
+
+        const updatedUser = result.value || result;
+        if (!updatedUser) {
+            throw new Error('User not found');
+        }
+
+        return {
+            success: true,
+            user: toPublicUser(updatedUser)
+        };
+    } catch (error) {
+        console.error('Error updating subscription:', error);
+        throw error;
+    }
+}
+
+async function updateProfile(userId, { username, email }) {
+    try {
+        const usersCollection = getUsersCollection();
+        const updateData = { updatedAt: new Date() };
+        
+        if (username) {
+            updateData.username = normalizeUsername(username);
+            
+            // Check if username already exists for someone else
+            const existingUser = await usersCollection.findOne({ 
+                username: updateData.username,
+                _id: { $ne: new ObjectId(userId) }
+            });
+            if (existingUser) {
+                throw new Error('Username already taken');
+            }
+        }
+        
+        if (email !== undefined) {
+            updateData.email = email;
+        }
+
+        const result = await usersCollection.findOneAndUpdate(
+            { _id: new ObjectId(userId) },
+            { $set: updateData },
+            { returnDocument: 'after' }
+        );
+
+        const updatedUser = result.value || result;
+        if (!updatedUser) {
+            throw new Error('User not found');
+        }
+
+        return {
+            success: true,
+            user: toPublicUser(updatedUser)
+        };
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        throw error;
+    }
+}
+
 module.exports = {
     createUser,
     authenticateUser,
     getUserBySessionToken,
     clearSession,
+    updateSubscription,
+    updateProfile,
     toPublicUser
 };

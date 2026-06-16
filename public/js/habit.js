@@ -88,47 +88,21 @@ export function createHabitCard(habit) {
     const habitId = habit._id || habit.id;
 
     return `
-        <div class="habit-card" data-id="${habitId}">
-            <div class="habit-header">
-                <h3 class="habit-title">${habit.name}</h3>
-                <span class="habit-badge">${emoji} ${habit.category}</span>
-            </div>
-
-            ${habit.description ? `<p class="habit-description">${habit.description}</p>` : ''}
-
-            <div class="habit-stats">
-                <div class="stat">
-                    <div class="stat-label">Days Tracked</div>
-                    <div class="stat-number">${daysTracked}</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label">Daily Goal</div>
-                    <div class="stat-number">${habit.goal}</div>
-                </div>
-            </div>
-
-            <div class="progress-container">
-                <div class="progress-label">
-                    <span>30-Day Progress</span>
-                    <span>${Math.round(progress)}%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progress}%"></div>
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn-icon btn-check" onclick="app.completeHabit('${habitId}')"
-                        style="${completedToday ? 'opacity: 0.6; cursor: not-allowed;' : ''}">
-                    ${completedToday ? '✓ Done Today' : '+ Complete'}
-                </button>
-                <button class="btn-icon btn-edit" onclick="openEditModal('${habitId}')">
-                    ✎ Edit
-                </button>
-                <button class="btn-icon btn-delete" onclick="app.deleteHabit('${habitId}')">
-                    🗑 Delete
-                </button>
-            </div>
+      <div class="habit-card" data-id="${habitId}">
+        <div class="row">
+            <span class="emoji">${emoji}</span>
+            <span class="badge ${completedToday ? 'active' : 'pending'}">${completedToday ? 'Completed' : 'Pending'}</span>
         </div>
+        <div>
+            <h4>${habit.name}</h4>
+            <div class="meta">${habit.category} · ${daysTracked}d tracked</div>
+        </div>
+        <div class="progress"><div style="width:${progress}%"></div></div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+            <button class="btn" style="flex:1; font-size:12px; padding:6px 10px;" onclick="app.completeHabit('${habitId}')" ${completedToday ? 'disabled' : ''}>${completedToday ? '✓ Done' : '+ Complete'}</button>
+            <button class="btn" style="font-size:12px; padding:6px 10px;" onclick="openEditModal('${habitId}')">✎ Edit</button>
+            <button class="btn" style="font-size:12px; padding:6px 10px; color:#ef4444; border-color:#fee2e2;" onclick="app.deleteHabit('${habitId}')">🗑</button>
+        </div>
+      </div>
     `;
 }

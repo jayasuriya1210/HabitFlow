@@ -1,203 +1,698 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>HabitFlow - Your Habit Tracking Companion</title>
-    <link rel="stylesheet" href="css/styles.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HabitFlow — Build habits that stick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+<!-- Optional: If you want Tailwind CSS v4 features to parse styles.css in the browser -->
+<script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #fafafa;
+    --text: #0a0a0a;
+    --text-muted: #6b7280;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.14);
+    --accent: #4f46e5;
+    --accent-hover: #4338ca;
+    --accent-soft: rgba(79,70,229,0.08);
+    --success: #10b981;
+    --success-soft: rgba(16,185,129,0.12);
+    --warn: #f59e0b;
+    --warn-soft: rgba(245,158,11,0.14);
+    --shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  [data-theme="dark"] {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface-2: #161616;
+    --text: #f5f5f5;
+    --text-muted: #8b8b8b;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --accent: #818cf8;
+    --accent-hover: #a5b4fc;
+    --accent-soft: rgba(129,140,248,0.12);
+    --success: #34d399;
+    --success-soft: rgba(52,211,153,0.15);
+    --warn: #fbbf24;
+    --warn-soft: rgba(251,191,36,0.16);
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-weight: 400;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  h1,h2,h3,h4 { font-weight: 500; letter-spacing: -0.01em; margin: 0; }
+  .serif { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; letter-spacing: -0.005em; }
+  .serif-italic { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-weight: 400; color: var(--accent); }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  input, select, textarea { font-family: inherit; }
+
+  /* Page switching */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 18px; border-radius: 8px; border: 0.5px solid var(--border-strong);
+    background: var(--surface); color: var(--text); font-weight: 500; font-size: 14px;
+    transition: all .15s ease;
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn-ghost { background: transparent; border-color: transparent; }
+  .btn-ghost:hover { background: var(--surface-2); }
+  .btn-block { width: 100%; }
+
+  /* Navbar */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(180%) blur(12px);
+    background: color-mix(in oklab, var(--bg) 80%, transparent);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .nav-inner { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 16px; }
+  .logo-mark { width: 26px; height: 26px; border-radius: 7px; background: var(--accent); display: grid; place-items: center; color: #fff; font-size: 14px; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: var(--text-muted); font-size: 14px; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .theme-btn {
+    width: 36px; height: 36px; border-radius: 8px; border: 0.5px solid var(--border-strong);
+    background: var(--surface); color: var(--text); display: grid; place-items: center; font-size: 14px;
+  }
+
+  /* Hero */
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  .hero { padding: 96px 24px 72px; text-align: center; }
+  .hero .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px;
+    border: 0.5px solid var(--border-strong); border-radius: 999px; font-size: 12px; color: var(--text-muted); margin-bottom: 24px;
+  }
+  .hero h1 { font-size: clamp(40px, 6vw, 64px); line-height: 1.05; letter-spacing: -0.03em; max-width: 820px; margin: 0 auto; font-weight: 500; }
+  .hero h1 .serif-italic { font-size: 1.05em; letter-spacing: -0.01em; font-weight: 400; }
+  .section-head h2 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: 44px; letter-spacing: -0.01em; }
+  .section-head h2 em { font-style: italic; color: var(--accent); }
+  .hero p.sub { color: var(--text-muted); max-width: 580px; margin: 20px auto 32px; font-size: 17px; }
+  .hero .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  /* Sections */
+  .section { padding: 80px 0; border-top: 0.5px solid var(--border); }
+  .section-head { text-align: center; margin-bottom: 48px; }
+  .section-head p { color: var(--text-muted); margin-top: 10px; }
+
+  /* Entrance animations */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .reveal { opacity: 0; }
+  .reveal.in { animation: fadeUp .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  .hero .eyebrow { animation: fadeIn .6s ease both; }
+  .hero h1 { animation: fadeUp .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: .05s; }
+  .hero p.sub { animation: fadeUp .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: .15s; }
+  .hero .cta-row { animation: fadeUp .8s cubic-bezier(.2,.7,.2,1) both; animation-delay: .25s; }
+  .feature, .stat, .price-card, .metric, .panel, .habit-card { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+  .feature:hover, .stat:hover, .metric:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+  .price-card:hover { transform: translateY(-3px); }
+  .btn { transition: transform .15s ease, background .15s ease, border-color .15s ease, color .15s ease; }
+  .btn:active { transform: scale(.97); }
+  .nav-item, .nav-links a { transition: color .15s ease, background .15s ease; }
+
+  /* Features */
+  .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .feature {
+    padding: 28px; background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px;
+  }
+  .feature .icon { width: 36px; height: 36px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; margin-bottom: 16px; }
+  .feature h3 { font-size: 15px; margin-bottom: 6px; }
+  .feature p { color: var(--text-muted); font-size: 14px; margin: 0; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center; }
+  .stat { padding: 32px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; }
+  .stat .num { font-size: 40px; font-weight: 400; letter-spacing: -0.02em; }
+  .stat .lbl { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+
+  /* Pricing */
+  .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: stretch; }
+  .price-card {
+    padding: 32px; background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px;
+    display: flex; flex-direction: column; gap: 20px; position: relative;
+  }
+  .price-card.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .badge-popular {
+    position: absolute; top: -10px; right: 24px; background: var(--accent); color: #fff;
+    font-size: 11px; padding: 4px 10px; border-radius: 999px; font-weight: 500;
+  }
+  .price-card h3 { font-size: 16px; }
+  .price-card .price { font-size: 40px; font-weight: 400; letter-spacing: -0.02em; }
+  .price-card .price small { font-size: 14px; color: var(--text-muted); font-weight: 400; }
+  .price-card ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .price-card li { font-size: 14px; color: var(--text-muted); display: flex; gap: 8px; align-items: flex-start; }
+  .price-card li::before { content: "✓"; color: var(--accent); }
+  .price-card .btn { margin-top: auto; }
+
+  /* Footer */
+  footer { padding: 40px 24px; border-top: 0.5px solid var(--border); text-align: center; color: var(--text-muted); font-size: 13px; }
+
+  /* Checkout */
+  .center-wrap { min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 60px 24px; background: var(--surface-2); }
+  .card-panel {
+    width: 100%; max-width: 980px; background: var(--surface); border: 0.5px solid var(--border); border-radius: 14px; padding: 40px;
+  }
+  .checkout-grid { display: grid; grid-template-columns: 1fr 360px; gap: 40px; }
+  .form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .form-field label { font-size: 13px; color: var(--text-muted); }
+  .form-field input, .form-field select {
+    padding: 11px 14px; border: 0.5px solid var(--border-strong); border-radius: 8px;
+    background: var(--bg); color: var(--text); font-size: 14px; outline: none; transition: border-color .15s;
+  }
+  .form-field input:focus { border-color: var(--accent); }
+  .form-field .error { color: #ef4444; font-size: 12px; min-height: 14px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .summary { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 12px; padding: 24px; height: fit-content; }
+  .summary h4 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+  .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 0.5px solid var(--border); font-size: 14px; }
+  .summary-row:last-of-type { border: none; }
+  .summary-row.total { font-weight: 500; font-size: 16px; padding-top: 14px; }
+  .secure-note { display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12px; margin-top: 12px; }
+
+  /* Login */
+  .login-card { max-width: 420px; margin: 0 auto; }
+  .login-card h1 { font-size: 26px; margin-bottom: 6px; }
+  .login-card p.sub { color: var(--text-muted); font-size: 14px; margin: 0 0 24px; }
+  .social-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .divider { display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 12px; margin: 18px 0; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 0.5px; background: var(--border-strong); }
+  .meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 13px; color: var(--text-muted); }
+  .meta-row a { color: var(--accent); }
+
+  /* Dashboard */
+  .dash-shell { display: flex; min-height: 100vh; }
+  .sidebar { 
+    width: 68px;
+    border-right: 0.5px solid var(--border); padding: 20px 16px; background: var(--surface); 
+    display: flex; flex-direction: column; gap: 4px; 
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+    overflow: hidden; white-space: nowrap;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+  }
+  .sidebar:hover {
+    width: 240px;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+  }
+  .sidebar .logo { padding: 6px 8px 18px; border-bottom: 0.5px solid var(--border); margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 14px; padding: 10px; border-radius: 8px;
+    color: var(--text-muted); font-size: 14px; cursor: pointer; border: none; background: transparent; text-align: left; width: 100%;
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-item.active { background: var(--surface-2); color: var(--text); font-weight: 500; }
+  .nav-item:hover { background: var(--surface-2); color: var(--text); }
+  .nav-icon { width: 16px; text-align: center; font-size: 16px; flex-shrink: 0; }
+  .nav-label { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-foot { padding: 12px 8px; border-top: 0.5px solid var(--border); display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--text-muted); overflow: hidden; white-space: nowrap; }
+
+  .main { flex: 1; max-width: 1200px; padding: 32px 40px; margin-left: 68px; }
+  .page-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+  .page-head h1 { font-size: 26px; }
+  .page-head p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+
+  .dash-section { display: none; }
+  .dash-section.active { display: block; }
+
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .metric { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 20px; }
+  .metric .lbl { color: var(--text-muted); font-size: 13px; }
+  .metric .num { font-size: 28px; letter-spacing: -0.02em; margin-top: 6px; }
+  .metric .delta { font-size: 12px; color: var(--success); margin-top: 4px; }
+
+  .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .panel { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 22px; }
+  .panel h3 { font-size: 14px; margin-bottom: 16px; }
+
+  /* Chart */
+  .chart { display: flex; align-items: flex-end; gap: 8px; height: 180px; padding-top: 10px; }
+  .bar { flex: 1; background: var(--accent); border-radius: 4px 4px 0 0; opacity: 0.85; position: relative; transition: opacity .15s; }
+  .bar:hover { opacity: 1; }
+  .chart-labels { display: flex; gap: 8px; margin-top: 8px; }
+  .chart-labels span { flex: 1; text-align: center; font-size: 11px; color: var(--text-muted); }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 12px 8px; border-bottom: 0.5px solid var(--border); }
+  th { font-weight: 500; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+  .badge.active { background: var(--success-soft); color: var(--success); }
+  .badge.paused, .badge.pending { background: var(--warn-soft); color: var(--warn); }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* Feed */
+  .feed { display: flex; flex-direction: column; gap: 14px; }
+  .feed-item { display: flex; gap: 12px; font-size: 13px; }
+  .feed-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-top: 6px; flex-shrink: 0; }
+  .feed-item .time { color: var(--text-muted); font-size: 12px; }
+
+  /* Habits grid */
+  .habits-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .habit-card {
+    background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 20px;
+    display: flex; flex-direction: column; gap: 12px; transition: border-color .15s;
+  }
+  .habit-card:hover { border-color: var(--border-strong); }
+  .habit-card .row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .habit-card .emoji { font-size: 22px; }
+  .habit-card h4 { font-size: 15px; }
+  .habit-card .meta { color: var(--text-muted); font-size: 13px; }
+  .progress { height: 4px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+  .progress > div { height: 100%; background: var(--accent); border-radius: 999px; }
+  .habit-empty {
+    border: 0.5px dashed var(--border-strong); background: transparent;
+    display: grid; place-items: center; min-height: 160px; color: var(--text-muted); font-size: 14px; cursor: pointer;
+    border-radius: 12px;
+  }
+  .habit-empty:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Settings */
+  .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 0.5px solid var(--border); }
+  .settings-row:last-child { border: none; }
+  .switch { width: 38px; height: 22px; background: var(--surface-2); border: 0.5px solid var(--border-strong); border-radius: 999px; position: relative; cursor: pointer; transition: background .2s; }
+  .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--text); transition: transform .2s; }
+  .switch.on { background: var(--accent); border-color: var(--accent); }
+  .switch.on::after { transform: translateX(16px); background: #fff; }
+
+  /* Success */
+  .success-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--success-soft); color: var(--success); display: grid; place-items: center; font-size: 30px; margin: 0 auto 20px; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .features, .pricing { grid-template-columns: 1fr 1fr; }
+    .stats { grid-template-columns: 1fr; }
+    .checkout-grid { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+    .dash-shell { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; }
+    .main { padding: 24px; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 560px) {
+    .features, .pricing, .metrics { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
-<body>
-    <section id="authScreen" class="auth-screen">
-        <div class="auth-shell">
-            <div class="auth-panel">
-                <div class="auth-header">
-                    <div>
-                        <p class="auth-kicker">Private workspace</p>
-                        <h1>HabitFlow</h1>
-                    </div>
-                    <button type="button" class="theme-toggle" id="authThemeToggle" title="Switch theme" aria-label="Switch theme">☾</button>
-                </div>
+<body class="bg-background text-foreground">
 
-                <p class="auth-copy">Sign in to pick up where you left off, or create a new account to start fresh.</p>
-
-                <div class="auth-tabs">
-                    <button type="button" class="auth-tab active" id="authLoginTab">Login</button>
-                    <button type="button" class="auth-tab" id="authRegisterTab">Register</button>
-                </div>
-
-                <div class="alert auth-alert" id="authAlert"></div>
-
-                <form id="loginForm" class="auth-form active">
-                    <label class="auth-field">
-                        <span>Username</span>
-                        <input type="text" id="loginUsername" autocomplete="username" placeholder="Enter your username" required>
-                    </label>
-                    <label class="auth-field">
-                        <span>Password</span>
-                        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter your password" required>
-                    </label>
-                    <button type="submit" class="btn-add-habit auth-submit">Login</button>
-                </form>
-
-                <form id="registerForm" class="auth-form">
-                    <label class="auth-field">
-                        <span>Username</span>
-                        <input type="text" id="registerUsername" autocomplete="username" placeholder="Choose a username" required>
-                    </label>
-                    <label class="auth-field">
-                        <span>Password</span>
-                        <input type="password" id="registerPassword" autocomplete="new-password" placeholder="Create a password" required>
-                    </label>
-                    <label class="auth-field">
-                        <span>Confirm password</span>
-                        <input type="password" id="registerConfirmPassword" autocomplete="new-password" placeholder="Repeat your password" required>
-                    </label>
-                    <button type="submit" class="btn-add-habit auth-submit">Create account</button>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <div id="appShell" class="app-shell" hidden>
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="nav-brand">
-                    <h1>🎯 HabitFlow</h1>
-                </div>
-
-                <div class="nav-stats">
-                    <span class="stat-item">
-                        <span class="stat-label">Active Habits</span>
-                        <span class="stat-value" id="activeHabitsCount">0</span>
-                    </span>
-                    <span class="stat-item">
-                        <span class="stat-label">Today's Progress</span>
-                        <span class="stat-value" id="todayProgress">0%</span>
-                    </span>
-                </div>
-
-                <div class="nav-actions">
-                    <span class="user-chip" id="userChip"></span>
-                    <button type="button" class="nav-btn icon-btn" id="themeToggle" title="Switch theme" aria-label="Switch theme">☾</button>
-                    <button type="button" class="nav-btn nav-ghost" id="logoutBtn">Logout</button>
-                </div>
-            </div>
-        </nav>
-
-        <div class="main-container">
-            <aside class="sidebar">
-                <div class="sidebar-content">
-                    <div class="add-habit-section">
-                        <h3>Create New Habit</h3>
-                        <form id="habitForm" class="habit-form">
-                            <input
-                                type="text"
-                                id="habitName"
-                                placeholder="Habit name (e.g., Morning Run)"
-                                required
-                            >
-                            <select id="habitCategory" required>
-                                <option value="">Select Category</option>
-                                <option value="Health">🏃 Health</option>
-                                <option value="Learning">📚 Learning</option>
-                                <option value="Productivity">💼 Productivity</option>
-                                <option value="Mindfulness">🧘 Mindfulness</option>
-                                <option value="Finance">💰 Finance</option>
-                                <option value="Social">👥 Social</option>
-                                <option value="Other">✨ Other</option>
-                            </select>
-                            <textarea
-                                id="habitDescription"
-                                placeholder="Description (optional)"
-                                rows="3"
-                            ></textarea>
-                            <input
-                                type="number"
-                                id="habitGoal"
-                                placeholder="Daily goal (e.g., 30 minutes)"
-                                min="1"
-                                required
-                            >
-                            <button type="submit" class="btn-add-habit">
-                                + Add Habit
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </aside>
-
-            <main class="main-content">
-                <div class="alert" id="alert"></div>
-
-                <div class="filter-tabs">
-                    <button class="tab-btn active" data-filter="all">All Habits</button>
-                    <button class="tab-btn" data-filter="Health">Health</button>
-                    <button class="tab-btn" data-filter="Learning">Learning</button>
-                    <button class="tab-btn" data-filter="Productivity">Productivity</button>
-                    <button class="tab-btn" data-filter="Mindfulness">Mindfulness</button>
-                    <button class="tab-btn" data-filter="Finance">Finance</button>
-                    <button class="tab-btn" data-filter="Social">Social</button>
-                </div>
-
-                <div class="habits-container" id="habitsContainer">
-                    <div class="empty-state">
-                        <div class="empty-icon">🔒</div>
-                        <h2>Sign in to continue</h2>
-                        <p>Your dashboard will appear here once you log in.</p>
-                    </div>
-                </div>
-            </main>
-        </div>
-
-        <div id="editModal" class="modal">
-            <div class="modal-content">
-                <span class="close-modal">&times;</span>
-                <h2>Edit Habit</h2>
-                <form id="editForm" class="habit-form">
-                    <input type="hidden" id="editHabitId">
-                    <input
-                        type="text"
-                        id="editHabitName"
-                        placeholder="Habit name"
-                        required
-                    >
-                    <select id="editHabitCategory" required>
-                        <option value="">Select Category</option>
-                        <option value="Health">🏃 Health</option>
-                        <option value="Learning">📚 Learning</option>
-                        <option value="Productivity">💼 Productivity</option>
-                        <option value="Mindfulness">🧘 Mindfulness</option>
-                        <option value="Finance">💰 Finance</option>
-                        <option value="Social">👥 Social</option>
-                        <option value="Other">✨ Other</option>
-                    </select>
-                    <textarea
-                        id="editHabitDescription"
-                        placeholder="Description (optional)"
-                        rows="3"
-                    ></textarea>
-                    <input
-                        type="number"
-                        id="editHabitGoal"
-                        placeholder="Daily goal"
-                        min="1"
-                        required
-                    >
-                    <div class="modal-buttons">
-                        <button type="submit" class="btn-primary">Save Changes</button>
-                        <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <footer class="footer">
-            <div class="footer-content">
-                <p>&copy; 2024 HabitFlow. Build habits, change your life. All rights reserved.</p>
-            </div>
-        </footer>
+<!-- ============ HOME ============ -->
+<div id="page-home" class="page active">
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="logo" onclick="go('home')"><span class="logo-mark">H</span> HabitFlow</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a onclick="go('login')" style="cursor:pointer">Login</a>
+      </div>
+      <div class="nav-right">
+        <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☾</button>
+        <button class="btn btn-primary" onclick="go('login')">Get started</button>
+      </div>
     </div>
+  </nav>
 
-    <script type="module" src="js/app.js"></script>
+  <section class="hero">
+    <span class="eyebrow">● New — Streak insights v2</span>
+    <h1>Build habits that <span class="serif-italic">actually stick</span>.</h1>
+    <p class="sub">HabitFlow is the minimalist habit tracker for people who want consistency without the clutter. Track, reflect, and grow — one day at a time.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="go('login')">Start free trial</button>
+      <button class="btn" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">See how it works →</button>
+    </div>
+  </section>
+
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2>Everything you need to <em>stay on track</em></h2>
+        <p>Focused tools designed around real behavior change.</p>
+      </div>
+      <div class="features">
+        <div class="feature reveal"><div class="icon">◎</div><h3>Daily tracking</h3><p>Mark habits complete with a single tap. Built for speed.</p></div>
+        <div class="feature reveal"><div class="icon">↗</div><h3>Streak insights</h3><p>Visualize momentum and bounce back from broken streaks faster.</p></div>
+        <div class="feature reveal"><div class="icon">◆</div><h3>Categories</h3><p>Group habits by health, learning, finance and more.</p></div>
+        <div class="feature reveal"><div class="icon">☁</div><h3>Sync everywhere</h3><p>Your data is always with you — web, mobile, and offline.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="stats">
+        <div class="stat reveal"><div class="num serif">120k+</div><div class="lbl">Active users</div></div>
+        <div class="stat reveal"><div class="num serif">4.2M</div><div class="lbl">Habits tracked</div></div>
+        <div class="stat reveal"><div class="num serif">98%</div><div class="lbl">Retention rate</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <h2>Simple, <em>honest</em> pricing</h2>
+        <p>Start free. Upgrade when you're ready.</p>
+      </div>
+      <div class="pricing">
+        <div class="price-card reveal">
+          <h3>Free</h3>
+          <div class="price serif">$0<small>/mo</small></div>
+          <ul><li>Up to 3 habits</li><li>Basic streaks</li><li>Community support</li></ul>
+          <button class="btn" onclick="selectPlan('Free', 0)">Get started</button>
+        </div>
+        <div class="price-card featured reveal">
+          <span class="badge-popular">Most popular</span>
+          <h3>Pro</h3>
+          <div class="price serif">$9<small>/mo</small></div>
+          <ul><li>Unlimited habits</li><li>Advanced analytics</li><li>Reminders & widgets</li><li>Priority support</li></ul>
+          <button class="btn btn-primary" onclick="selectPlan('Pro', 9)">Start free trial</button>
+        </div>
+        <div class="price-card reveal">
+          <h3>Enterprise</h3>
+          <div class="price serif">$29<small>/mo</small></div>
+          <ul><li>Everything in Pro</li><li>Team workspaces</li><li>SSO & audit logs</li><li>Dedicated CSM</li></ul>
+          <button class="btn" onclick="selectPlan('Enterprise', 29)">Subscribe</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>© 2026 HabitFlow — Made for people who show up.</footer>
+</div>
+
+<!-- ============ CHECKOUT ============ -->
+<div id="page-checkout" class="page">
+  <nav class="nav"><div class="nav-inner">
+    <a class="logo" onclick="go('home')"><span class="logo-mark">H</span> HabitFlow</a>
+    <button class="btn btn-ghost" onclick="go('home')">← Back</button>
+  </div></nav>
+  <div class="center-wrap">
+    <div class="card-panel">
+      <h1 style="font-size:24px; margin-bottom:6px;">Subscribe to <span id="co-plan">Pro</span></h1>
+      <p style="color:var(--text-muted); margin:0 0 28px;">14-day free trial. Cancel anytime.</p>
+      <div class="checkout-grid">
+        <form id="checkout-form" onsubmit="event.preventDefault(); submitCheckout();">
+          <div class="form-field">
+            <label>Email</label>
+            <input type="email" id="co-email" required placeholder="you@example.com" />
+            <span class="error"></span>
+          </div>
+          <div class="form-field">
+            <label>Cardholder name</label>
+            <input type="text" id="co-name" required placeholder="Jane Doe" />
+            <span class="error"></span>
+          </div>
+          <div class="form-field">
+            <label>Card number</label>
+            <input type="text" id="co-card" required inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456" oninput="formatCard(this)" />
+            <span class="error"></span>
+          </div>
+          <div class="row-2">
+            <div class="form-field">
+              <label>Expiry</label>
+              <input type="text" id="co-exp" required maxlength="5" placeholder="MM/YY" oninput="formatExp(this)" />
+              <span class="error"></span>
+            </div>
+            <div class="form-field">
+              <label>CVC</label>
+              <input type="text" id="co-cvc" required inputmode="numeric" maxlength="4" placeholder="123" />
+              <span class="error"></span>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Start free trial</button>
+          <div class="secure-note">🔒 Payments are encrypted and secure.</div>
+        </form>
+        <aside class="summary">
+          <h4>Order summary</h4>
+          <div class="summary-row"><span>Plan</span><span id="sum-plan">Pro</span></div>
+          <div class="summary-row"><span>Billing</span><span>Monthly</span></div>
+          <div class="summary-row"><span>Trial</span><span>14 days free</span></div>
+          <div class="summary-row total"><span>Due today</span><span>$0.00</span></div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:10px;">After trial: <span id="sum-after">$9.00</span>/month</div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SUCCESS ============ -->
+<div id="page-success" class="page">
+  <div class="center-wrap" style="align-items:center;">
+    <div class="card-panel" style="max-width:480px; text-align:center;">
+      <div class="success-icon">✓</div>
+      <h1 style="font-size:24px; margin-bottom:8px;">You're all set</h1>
+      <p style="color:var(--text-muted); margin:0 0 24px;">Your subscription is active. Welcome to HabitFlow.</p>
+      <button class="btn btn-primary" onclick="go('dashboard')">Go to dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOGIN ============ -->
+<div id="page-login" class="page">
+  <nav class="nav"><div class="nav-inner">
+    <a class="logo" onclick="go('home')"><span class="logo-mark">H</span> HabitFlow</a>
+    <button class="theme-btn" onclick="toggleTheme()">☾</button>
+  </div></nav>
+  <div class="center-wrap">
+    <div class="card-panel login-card">
+      <h1>Welcome back</h1>
+      <p class="sub">Sign in to continue to your dashboard.</p>
+      <div class="social-row">
+        <button class="btn" onclick="go('dashboard')">G  Google</button>
+        <button class="btn" onclick="go('dashboard')">⌥  GitHub</button>
+      </div>
+      <div class="divider">or continue with email</div>
+      
+      <div id="auth-forms-container">
+        <!-- Login Form -->
+        <form id="loginForm">
+          <div class="form-field">
+            <label>Username</label>
+            <input type="text" id="loginUsername" required placeholder="your username" />
+            <span class="error" id="login-email-err"></span>
+          </div>
+          <div class="form-field">
+            <label>Password</label>
+            <input type="password" id="loginPassword" required placeholder="••••••••" />
+            <span class="error" id="login-pass-err"></span>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+          <div class="meta-row">
+            <a href="#">Forgot password?</a>
+            <span>New here? <a onclick="document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block';" style="cursor:pointer">Sign up</a></span>
+          </div>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" style="display:none;">
+          <div class="form-field">
+            <label>Username</label>
+            <input type="text" id="registerUsername" required placeholder="choose a username" />
+          </div>
+          <div class="form-field">
+            <label>Password</label>
+            <input type="password" id="registerPassword" required placeholder="••••••••" />
+          </div>
+          <div class="form-field">
+            <label>Confirm Password</label>
+            <input type="password" id="registerConfirmPassword" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Create account</button>
+          <div class="meta-row">
+            <span>Already have an account? <a onclick="document.getElementById('registerForm').style.display='none'; document.getElementById('loginForm').style.display='block';" style="cursor:pointer">Sign in</a></span>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="page-dashboard" class="page">
+  <div class="dash-shell">
+    <aside class="sidebar">
+      <div class="logo"><span class="logo-mark">H</span> <span class="nav-label">HabitFlow</span></div>
+      <button class="nav-item active" data-section="overview" onclick="showSection(this,'overview')"><span class="nav-icon">◐</span> <span class="nav-label">Overview</span></button>
+      <button class="nav-item" data-section="habits" onclick="showSection(this,'habits')"><span class="nav-icon">◎</span> <span class="nav-label">Habits</span></button>
+      <button class="nav-item" data-section="analytics" onclick="showSection(this,'analytics')"><span class="nav-icon">▤</span> <span class="nav-label">Analytics</span></button>
+      
+      <button class="nav-item" data-section="settings" onclick="showSection(this,'settings')"><span class="nav-icon">⚙</span> <span class="nav-label">Settings</span></button>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-foot" style="padding: 12px 10px; margin-top: auto;">
+        <button class="theme-btn nav-icon" onclick="toggleTheme()" style="background:transparent; border:none; color:inherit; cursor:pointer; padding:0;">☾</button>
+        <span id="sidebar-user" class="nav-label">@jane</span>
+      </div>
+      <button class="nav-item" id="logoutBtn"><span class="nav-icon">↩</span> <span class="nav-label">Logout</span></button>
+    </aside>
+    <main class="main">
+      <!-- Overview -->
+      <section class="dash-section active" id="sec-overview">
+        <div class="page-head"><div><h1>Overview</h1><p id="overview-welcome">Welcome back, Jane.</p></div>
+          <button class="btn btn-primary" onclick="document.getElementById('createHabitModal').style.display='block'">+ New habit</button>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="lbl">Active habits</div><div class="num" id="activeHabitsCount">0</div><div class="delta">+2 this week</div></div>
+          <div class="metric"><div class="lbl">Current streak</div><div class="num" id="overviewStreak">0d</div><div class="delta">Best: 41d</div></div>
+          <div class="metric"><div class="lbl">Today Progress</div><div class="num" id="todayProgress">0%</div><div class="delta">+4% vs last week</div></div>
+          <div class="metric"><div class="lbl">Check-ins today</div><div class="num" id="overviewCheckins">0/0</div><div class="delta">3 remaining</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <h3>Activity (last 7 days)</h3>
+            <div class="chart" id="overview-chart"></div>
+            <div class="chart-labels"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+          </div>
+          <div class="panel">
+            <h3>Pending tasks</h3>
+            <div class="feed" id="pending-tasks-feed" style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:16px;">
+          <h3>Recent habits</h3>
+          <table>
+            <thead><tr><th>Habit</th><th>Category</th><th>Streak</th><th>Status</th></tr></thead>
+            <tbody id="recent-habits-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Habits -->
+      <section class="dash-section" id="sec-habits">
+        <div class="page-head"><div><h1>Habits</h1><p>Your daily practices.</p></div></div>
+        <div class="habits-grid" id="habits-grid"></div>
+      </section>
+
+      <!-- Analytics -->
+      <section class="dash-section" id="sec-analytics">
+        <div class="page-head"><div><h1>Analytics</h1><p>How you've been doing.</p></div></div>
+        <div class="metrics">
+          <div class="metric"><div class="lbl">Total completions</div><div class="num" id="analyticsTotal">0</div></div>
+          <div class="metric"><div class="lbl">Avg/day</div><div class="num">5.8</div></div>
+          <div class="metric"><div class="lbl">Longest streak</div><div class="num" id="analyticsLongest">0d</div></div>
+          <div class="metric"><div class="lbl">Skipped days</div><div class="num">9</div></div>
+        </div>
+        <div class="panel">
+          <h3>Completions per week</h3>
+          <div class="chart" id="analytics-chart"></div>
+          <div class="chart-labels"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span><span>W8</span></div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section class="dash-section" id="sec-settings">
+        <div class="page-head"><div><h1>Settings</h1><p>Manage your account.</p></div></div>
+        <div class="panel" style="margin-bottom:16px;">
+          <h3>Profile</h3>
+          <div class="form-field"><label>Name</label><div id="profileNameDisplay" style="padding: 11px 14px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 8px;"></div></div>
+          <div class="form-field"><label>Email</label><div id="profileEmailDisplay" style="padding: 11px 14px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 8px;"></div></div>
+        </div>
+        <div class="panel" style="margin-bottom:16px;">
+          <h3>Appearance</h3>
+          <div class="settings-row">
+            <div><div>Dark mode</div><div style="color:var(--text-muted); font-size:13px;">Use a darker theme across the app.</div></div>
+            <div class="switch" id="themeToggle"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Billing</h3>
+          <div class="settings-row">
+            <div><div>Current plan</div><div style="color:var(--text-muted); font-size:13px;"><span id="currentPlanDisplay">Free</span></div></div>
+            <button class="btn">Manage</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+
+<div id="createHabitModal" class="page" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5);">
+  <div class="center-wrap" style="align-items:center; min-height:100vh;">
+    <div class="card-panel" style="max-width: 480px; padding: 32px; width: 100%;">
+      <h2 style="margin-bottom: 16px;">Create New Habit</h2>
+      <form id="habitForm">
+        <div class="form-field"><label>Name</label><input type="text" id="habitName" required placeholder="e.g. Morning run" /></div>
+        <div class="form-field"><label>Category</label>
+          <select id="habitCategory" required>
+            <option value="Health">Health</option>
+            <option value="Learning">Learning</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Mindfulness">Mindfulness</option>
+            <option value="Finance">Finance</option>
+            <option value="Social">Social</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-field"><label>Goal (target)</label><input type="number" id="habitGoal" required value="30"/></div>
+        <div class="form-field"><label>Description</label><textarea id="habitDescription"></textarea></div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <button type="submit" class="btn btn-primary">Create</button>
+          <button type="button" class="btn" onclick="document.getElementById('createHabitModal').style.display='none'">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="editModal" class="page" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5);">
+  <div class="center-wrap" style="align-items:center; min-height:100vh;">
+    <div class="card-panel" style="max-width: 480px; padding: 32px; width: 100%;">
+      <h2 style="margin-bottom: 16px;">Edit Habit</h2>
+      <form id="editForm">
+        <input type="hidden" id="editHabitId" />
+        <div class="form-field"><label>Name</label><input type="text" id="editHabitName" required /></div>
+        <div class="form-field"><label>Category</label>
+          <select id="editHabitCategory" required>
+            <option value="Health">Health</option>
+            <option value="Learning">Learning</option>
+            <option value="Productivity">Productivity</option>
+            <option value="Mindfulness">Mindfulness</option>
+            <option value="Finance">Finance</option>
+            <option value="Social">Social</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-field"><label>Goal (target)</label><input type="number" id="editHabitGoal" required /></div>
+        <div class="form-field"><label>Description</label><textarea id="editHabitDescription"></textarea></div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn close-modal" onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="appAlerts" style="position:fixed; bottom:20px; right:20px; z-index:1000; display:flex; flex-direction:column; gap:10px;"></div>
+
 </body>
 </html>
