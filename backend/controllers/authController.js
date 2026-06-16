@@ -49,9 +49,41 @@ async function logout(req, res) {
     }
 }
 
+async function subscribe(req, res) {
+    try {
+        const { plan } = req.body;
+        if (!plan) {
+            return res.status(400).json({ error: 'Plan name is required' });
+        }
+        
+        const result = await userService.updateSubscription(req.authUser.id, plan);
+        res.json({
+            message: `Successfully subscribed to ${plan} plan`,
+            user: result.user
+        });
+    } catch (error) {
+        console.error('Error subscribing user:', error);
+        res.status(500).json({ error: 'Failed to update subscription' });
+    }
+}
+
+async function updateProfile(req, res) {
+    try {
+        const userId = req.authUser.id;
+        const { username, email } = req.body;
+        
+        const result = await userService.updateProfile(userId, { username, email });
+        res.json({ message: 'Profile updated successfully', user: result.user });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+}
+
 module.exports = {
     register,
     login,
     me,
-    logout
+    logout,
+    subscribe,
+    updateProfile
 };

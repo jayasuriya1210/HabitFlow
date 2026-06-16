@@ -1,5 +1,3 @@
-// HabitFlow Database Configuration
-// ==================================
 
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
