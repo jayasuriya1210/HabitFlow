@@ -2,7 +2,7 @@
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongo:27017/';
 const DB_NAME = process.env.DB_NAME || 'habitflow';
 const COLLECTION_NAME = 'habits';
 const USERS_COLLECTION_NAME = 'users';

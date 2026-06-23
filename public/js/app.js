@@ -452,7 +452,7 @@ class HabitFlow {
     // Subscribe
     async subscribe(planName) {
         try {
-            const response = await apiFetch('/user/subscribe', {
+            const response = await apiFetch('/auth/subscribe', {
                 method: 'POST',
                 body: JSON.stringify({ plan: planName })
             });
@@ -485,7 +485,7 @@ class HabitFlow {
                 return;
             }
             
-            const response = await apiFetch('/user/profile', {
+            const response = await apiFetch('/auth/profile', {
                 method: 'PUT',
                 body: JSON.stringify({ username, email })
             });
